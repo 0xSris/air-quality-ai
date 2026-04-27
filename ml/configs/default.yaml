@@ -1,0 +1,37 @@
+random_seed: 42
+forecast_horizon_hours: 24
+lookback_hours: 168
+validation_fraction: 0.15
+test_fraction: 0.15
+targets:
+  - O3_target
+  - NO2_target
+base_features:
+  - O3_forecast
+  - NO2_forecast
+  - T_forecast
+  - q_forecast
+  - u_forecast
+  - v_forecast
+  - w_forecast
+  - NO2_satellite
+  - HCHO_satellite
+  - ratio_satellite
+lag_features:
+  - O3_target
+  - NO2_target
+rolling_windows:
+  - 6
+  - 24
+  - 72
+baseline:
+  n_estimators: 80
+  max_depth: 10
+deep:
+  hidden_size: 48
+  num_layers: 2
+  dropout: 0.2
+  batch_size: 256
+  learning_rate: 0.001
+  epochs: 4
+  weight_decay: 0.0001
