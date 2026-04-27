@@ -8,6 +8,7 @@ import {
   setApiToken,
   signIn,
   signOut,
+  signUp,
 } from "../services/api";
 import { AgentStep, DashboardContext, ResearchReport, SessionDetail, UserProfile } from "../types/research";
 
@@ -91,7 +92,8 @@ export function AgentDock({
   const [sessionDetail, setSessionDetail] = useState<SessionDetail | null>(null);
   const [query, setQuery] = useState("");
   const [busy, setBusy] = useState(false);
-  const [authForm, setAuthForm] = useState({ email: "", password: "" });
+  const [authMode, setAuthMode] = useState<"signin" | "signup">("signin");
+  const [authForm, setAuthForm] = useState({ email: "", password: "", displayName: "" });
   const [error, setError] = useState<string | null>(null);
   const [confidenceOpen, setConfidenceOpen] = useState(false);
   const [runPhaseIndex, setRunPhaseIndex] = useState(0);
@@ -144,15 +146,36 @@ export function AgentDock({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [externalRunRequest?.nonce, user]);
 
-  async function handleSignIn() {
+  async function handleAuthenticate() {
     setError(null);
+    const email = authForm.email.trim();
+    const password = authForm.password.trim();
+    const displayName = authForm.displayName.trim();
+    if (!email || !password) {
+      setError("Enter an email and password to connect the investigation agent.");
+      return;
+    }
+    if (authMode === "signup" && !displayName) {
+      setError("Add your name so the workspace can create a profile.");
+      return;
+    }
     try {
-      const response = await signIn(authForm);
+      const response =
+        authMode === "signup"
+          ? await signUp({ email, password, display_name: displayName })
+          : await signIn({ email, password });
       setToken(response.token);
       setUser(response.user);
-      setAuthForm({ email: "", password: "" });
+      setAuthForm({ email: "", password: "", displayName: "" });
     } catch (authError) {
-      setError(formatApiError(authError, "Unable to sign in to the investigation agent."));
+      setError(
+        formatApiError(
+          authError,
+          authMode === "signup"
+            ? "Unable to create the investigation workspace."
+            : "Unable to sign in to the investigation agent.",
+        ),
+      );
     }
   }
 
@@ -222,7 +245,7 @@ export function AgentDock({
   function handleAuthKeyDown(event: KeyboardEvent<HTMLInputElement>) {
     if (event.key === "Enter") {
       event.preventDefault();
-      void handleSignIn();
+      void handleAuthenticate();
     }
   }
 
@@ -275,25 +298,59 @@ export function AgentDock({
       </div>
 
       {!user ? (
-        <div className="terminal-auth">
-          <input
-            className="terminal-input compact"
-            placeholder="email"
-            value={authForm.email}
-            onChange={(event) => setAuthForm((state) => ({ ...state, email: event.target.value }))}
-            onKeyDown={handleAuthKeyDown}
-          />
-          <input
-            className="terminal-input compact"
-            type="password"
-            placeholder="password"
-            value={authForm.password}
-            onChange={(event) => setAuthForm((state) => ({ ...state, password: event.target.value }))}
-            onKeyDown={handleAuthKeyDown}
-          />
-          <button className="terminal-run" type="button" onClick={() => void handleSignIn()}>
-            Connect agent
-          </button>
+        <div className="terminal-auth-shell">
+          <div className="auth-callout">
+            <span className="mono-label">Workspace access</span>
+            <strong>{authMode === "signup" ? "Create your analyst account." : "Connect your investigation workspace."}</strong>
+            <p>
+              Save sessions, export briefs, keep audit traces, and continue investigations across demos.
+            </p>
+          </div>
+          <div className="auth-mode-switch" aria-label="Authentication mode">
+            <button
+              type="button"
+              className={authMode === "signin" ? "active" : ""}
+              onClick={() => setAuthMode("signin")}
+            >
+              Sign in
+            </button>
+            <button
+              type="button"
+              className={authMode === "signup" ? "active" : ""}
+              onClick={() => setAuthMode("signup")}
+            >
+              Create account
+            </button>
+          </div>
+          <div className={authMode === "signup" ? "terminal-auth signup" : "terminal-auth"}>
+            {authMode === "signup" ? (
+              <input
+                className="terminal-input compact"
+                placeholder="display name"
+                value={authForm.displayName}
+                onChange={(event) => setAuthForm((state) => ({ ...state, displayName: event.target.value }))}
+                onKeyDown={handleAuthKeyDown}
+              />
+            ) : null}
+            <input
+              className="terminal-input compact"
+              placeholder="email"
+              value={authForm.email}
+              onChange={(event) => setAuthForm((state) => ({ ...state, email: event.target.value }))}
+              onKeyDown={handleAuthKeyDown}
+            />
+            <input
+              className="terminal-input compact"
+              type="password"
+              placeholder="password"
+              value={authForm.password}
+              onChange={(event) => setAuthForm((state) => ({ ...state, password: event.target.value }))}
+              onKeyDown={handleAuthKeyDown}
+            />
+            <button className="terminal-run auth-primary" type="button" onClick={() => void handleAuthenticate()}>
+              {authMode === "signup" ? "Create workspace" : "Connect agent"}
+            </button>
+          </div>
         </div>
       ) : (
         <>

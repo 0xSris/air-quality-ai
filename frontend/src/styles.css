@@ -1042,11 +1042,74 @@ button {
   padding: 26px 26px 28px;
 }
 
+.terminal-auth-shell {
+  margin-top: 22px;
+  padding: 18px;
+  border-top: 1px solid rgba(110, 199, 255, 0.22);
+  background:
+    radial-gradient(circle at 12% 0%, rgba(96, 196, 255, 0.14), transparent 34%),
+    linear-gradient(135deg, rgba(6, 15, 26, 0.72), rgba(7, 16, 24, 0.38));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 26px 90px rgba(37, 118, 188, 0.08);
+}
+
+.auth-callout {
+  max-width: 760px;
+}
+
+.auth-callout strong {
+  display: block;
+  margin-top: 8px;
+  color: #f4f8ff;
+  font-size: clamp(1.35rem, 2vw, 2rem);
+  letter-spacing: -0.03em;
+}
+
+.auth-callout p {
+  max-width: 640px;
+  margin: 8px 0 0;
+  color: rgba(188, 207, 230, 0.72);
+  line-height: 1.55;
+}
+
+.auth-mode-switch {
+  display: inline-flex;
+  gap: 6px;
+  margin-top: 18px;
+  padding: 5px;
+  border: 1px solid rgba(126, 188, 255, 0.14);
+  border-radius: 999px;
+  background: rgba(7, 15, 24, 0.68);
+}
+
+.auth-mode-switch button {
+  border: 0;
+  border-radius: 999px;
+  padding: 10px 16px;
+  background: transparent;
+  color: rgba(188, 207, 230, 0.68);
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.auth-mode-switch button.active {
+  color: #f7fbff;
+  background: linear-gradient(135deg, rgba(81, 185, 255, 0.22), rgba(125, 244, 211, 0.12));
+  box-shadow: 0 0 28px rgba(91, 197, 255, 0.15);
+}
+
 .terminal-auth,
 .terminal-command-row {
   display: grid;
   grid-template-columns: 1fr 1fr auto;
   gap: 12px;
+}
+
+.terminal-auth {
+  margin-top: 14px;
+}
+
+.terminal-auth.signup {
+  grid-template-columns: 0.8fr 1fr 0.8fr auto;
 }
 
 .terminal-command-row {
@@ -1059,6 +1122,10 @@ button {
   border-radius: 16px;
   border: 1px solid rgba(146, 175, 219, 0.14);
   background: rgba(6, 11, 18, 0.5);
+}
+
+.auth-primary {
+  box-shadow: 0 16px 58px rgba(67, 153, 255, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .terminal-context-row {
@@ -1386,6 +1453,10 @@ button {
   .surface-input-row,
   .terminal-command-row,
   .terminal-auth {
+    grid-template-columns: 1fr;
+  }
+
+  .terminal-auth.signup {
     grid-template-columns: 1fr;
   }
 
