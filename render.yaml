@@ -1,0 +1,34 @@
+services:
+  - type: web
+    name: air-quality-ai
+    runtime: python
+    plan: free
+    rootDir: .
+    buildCommand: pip install -e ".[dev]"
+    startCommand: python -m uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_NAME
+        value: AeroIntel
+      - key: LIVE_SOURCE_MODE
+        value: auto
+      - key: LIVE_EXTERNAL_PROVIDER
+        value: openmeteo
+      - key: LIVE_EXTERNAL_TIMEZONE
+        value: Asia/Kolkata
+      - key: MODEL_NAME
+        value: baseline_random_forest
+      - key: MODEL_DEVICE
+        value: cpu
+      - key: APP_DB_PATH
+        value: ./backend/app.db
+      - key: RESEARCH_EXPORT_DIR
+        value: ./backend/exports
+      - key: GROQ_MODEL
+        value: llama-3.3-70b-versatile
+      - key: EMBEDDING_MODEL
+        value: all-MiniLM-L6-v2
+      - key: GROQ_API_KEY
+        sync: false
