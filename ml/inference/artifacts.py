@@ -5,9 +5,6 @@ from pathlib import Path
 from typing import Any
 
 import joblib
-import torch
-
-from ml.training.sequence import LSTMForecaster
 
 
 class ArtifactRegistry:
@@ -19,6 +16,10 @@ class ArtifactRegistry:
         if model_name == "baseline_random_forest":
             return joblib.load(self.artifacts_dir / f"{model_name}.joblib")
         if model_name == "lstm":
+            import torch
+
+            from ml.training.sequence import LSTMForecaster
+
             payload = torch.load(self.artifacts_dir / "lstm.pt", map_location=device)
             model = LSTMForecaster(
                 feature_columns=payload["feature_columns"],
@@ -33,4 +34,3 @@ class ArtifactRegistry:
             model.artifacts.target_scaler = payload["target_scaler"]
             return model
         raise KeyError(f"Unknown model: {model_name}")
-
