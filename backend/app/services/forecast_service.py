@@ -17,6 +17,8 @@ class ForecastService:
     def generate_forecast(self, request: ForecastRequest) -> ForecastResponse:
         model_name = request.model_name or self.settings.model_name
         horizon = request.horizon_hours or self.settings.forecast_horizon_hours
+        if self.settings.app_env == "production":
+            return self._generate_lightweight_forecast(request.site_id, horizon, model_name)
         model = self.registry.load_model(model_name, device=self.settings.model_device)
         unseen = self.repository.site_frame(request.site_id, split="unseen")
         model_feature_columns = self.repository.model_feature_columns(model_name)
@@ -69,6 +71,36 @@ class ForecastService:
             )
         return ForecastResponse(
             site_id=request.site_id,
+            horizon_hours=horizon,
+            model_name=model_name,
+            generated_at=datetime.utcnow(),
+            points=points,
+        )
+
+    def _generate_lightweight_forecast(
+        self, site_id: int, horizon: int, model_name: str
+    ) -> ForecastResponse:
+        frame = self.repository.forecast_input_frame(site_id).tail(horizon)
+        residual = self.repository.metadata["metrics"].get(
+            model_name,
+            self.repository.metadata["metrics"]["baseline_random_forest"],
+        )
+        o3_std = residual["O3_target"]["rmse"]
+        no2_std = residual["NO2_target"]["rmse"]
+        points = [
+            ForecastPoint(
+                timestamp=row.timestamp.to_pydatetime(),
+                o3=float(row.O3_forecast),
+                no2=float(row.NO2_forecast),
+                o3_lower=float(row.O3_forecast - 1.96 * o3_std),
+                o3_upper=float(row.O3_forecast + 1.96 * o3_std),
+                no2_lower=float(row.NO2_forecast - 1.96 * no2_std),
+                no2_upper=float(row.NO2_forecast + 1.96 * no2_std),
+            )
+            for row in frame.itertuples()
+        ]
+        return ForecastResponse(
+            site_id=site_id,
             horizon_hours=horizon,
             model_name=model_name,
             generated_at=datetime.utcnow(),

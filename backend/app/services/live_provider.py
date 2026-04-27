@@ -56,7 +56,7 @@ class SimulationProvider:
         self.settings = settings
 
     def get_snapshot(self, site_id: int) -> LiveResponse:
-        frame = self.repository.site_frame(site_id, split="unseen")
+        frame = self.repository.forecast_input_frame(site_id)
         position = int(datetime.utcnow().timestamp() // max(self.settings.live_refresh_seconds, 1)) % len(frame)
         recent = frame.iloc[max(0, position - 24) : position + 1]
         current_row = frame.iloc[position]

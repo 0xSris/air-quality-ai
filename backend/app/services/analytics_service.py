@@ -14,7 +14,7 @@ class AnalyticsService:
         return DatasetSummaryResponse.model_validate(self.repository.dataset_summary)
 
     def historical_trend(self, site_id: int, hours: int = 168) -> TrendResponse:
-        frame = self.repository.site_frame(site_id).tail(hours)
+        frame = self.repository.observation_frame(site_id).tail(hours)
         points = [
             PollutantPoint(
                 timestamp=row.timestamp.to_pydatetime(),
@@ -27,5 +27,4 @@ class AnalyticsService:
         return TrendResponse(site_id=site_id, points=points)
 
     def latest_context(self, site_id: int) -> pd.DataFrame:
-        return self.repository.site_frame(site_id)
-
+        return self.repository.observation_frame(site_id)

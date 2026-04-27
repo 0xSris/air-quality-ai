@@ -40,8 +40,47 @@ class DataRepository:
             return model_columns[model_name]
         return self.metadata.get("feature_columns", [])
 
-    def site_frame(self, site_id: int, split: str = "train") -> pd.DataFrame:
-        frame = self.train_features if split == "train" else self.unseen_features
-        site_frame = frame.loc[frame["site_id"] == site_id].copy()
+    def site_frame(
+        self,
+        site_id: int,
+        split: str = "train",
+        columns: list[str] | None = None,
+    ) -> pd.DataFrame:
+        path = self.settings.processed_data_dir / (
+            "train_features.parquet" if split == "train" else "unseen_features.parquet"
+        )
+        requested_columns = self._columns_with_required(columns)
+        try:
+            site_frame = pd.read_parquet(
+                path,
+                columns=requested_columns,
+                filters=[("site_id", "=", site_id)],
+            )
+        except Exception:
+            # Some parquet engines do not support predicate pushdown consistently.
+            # Keep this fallback narrow by still reading only the columns needed.
+            frame = pd.read_parquet(path, columns=requested_columns)
+            site_frame = frame.loc[frame["site_id"] == site_id].copy()
         site_frame["timestamp"] = pd.to_datetime(site_frame["timestamp"])
         return site_frame.sort_values("timestamp").reset_index(drop=True)
+
+    def observation_frame(self, site_id: int, split: str = "train") -> pd.DataFrame:
+        return self.site_frame(
+            site_id,
+            split=split,
+            columns=["timestamp", "site_id", "O3_target", "NO2_target"],
+        )
+
+    def forecast_input_frame(self, site_id: int) -> pd.DataFrame:
+        return self.site_frame(
+            site_id,
+            split="unseen",
+            columns=["timestamp", "site_id", "O3_forecast", "NO2_forecast"],
+        )
+
+    @staticmethod
+    def _columns_with_required(columns: list[str] | None) -> list[str] | None:
+        if columns is None:
+            return None
+        ordered = ["timestamp", "site_id", *columns]
+        return list(dict.fromkeys(ordered))
