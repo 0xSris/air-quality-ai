@@ -1,0 +1,86 @@
+{
+  "total_sites": 7,
+  "total_train_rows": 171679,
+  "total_unseen_rows": 73296,
+  "features": [
+    "O3_forecast",
+    "NO2_forecast",
+    "T_forecast",
+    "q_forecast",
+    "u_forecast",
+    "v_forecast",
+    "w_forecast",
+    "NO2_satellite",
+    "HCHO_satellite",
+    "ratio_satellite"
+  ],
+  "targets": [
+    "O3_target",
+    "NO2_target"
+  ],
+  "sites": [
+    {
+      "site_id": 1,
+      "latitude": 28.69536,
+      "longitude": 77.18168,
+      "train_rows": 25081,
+      "unseen_rows": 10872,
+      "train_start": "2019-07-14T00:00:00",
+      "train_end": "2024-06-30T00:00:00"
+    },
+    {
+      "site_id": 2,
+      "latitude": 28.5718,
+      "longitude": 77.07125,
+      "train_rows": 25969,
+      "unseen_rows": 10920,
+      "train_start": "2019-07-10T00:00:00",
+      "train_end": "2024-06-30T00:00:00"
+    },
+    {
+      "site_id": 3,
+      "latitude": 28.58278,
+      "longitude": 77.23441,
+      "train_rows": 21913,
+      "unseen_rows": 9288,
+      "train_start": "2019-07-13T00:00:00",
+      "train_end": "2024-06-30T00:00:00"
+    },
+    {
+      "site_id": 4,
+      "latitude": 28.82286,
+      "longitude": 77.10197,
+      "train_rows": 24505,
+      "unseen_rows": 10488,
+      "train_start": "2019-07-11T00:00:00",
+      "train_end": "2024-06-30T00:00:00"
+    },
+    {
+      "site_id": 5,
+      "latitude": 28.53077,
+      "longitude": 77.27123,
+      "train_rows": 25081,
+      "unseen_rows": 10848,
+      "train_start": "2019-07-10T00:00:00",
+      "train_end": "2024-06-30T00:00:00"
+    },
+    {
+      "site_id": 6,
+      "latitude": 28.72954,
+      "longitude": 77.09601,
+      "train_rows": 26353,
+      "unseen_rows": 11160,
+      "train_start": "2019-07-10T00:00:00",
+      "train_end": "2024-06-30T00:00:00"
+    },
+    {
+      "site_id": 7,
+      "latitude": 28.71052,
+      "longitude": 77.24951,
+      "train_rows": 22777,
+      "unseen_rows": 9720,
+      "train_start": "2019-07-10T00:00:00",
+      "train_end": "2024-06-30T00:00:00"
+    }
+  ]
+}
