@@ -1,0 +1,31 @@
+version: "3.9"
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./:/workspace
+    working_dir: /workspace
+    command: uvicorn backend.app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./:/workspace
+    working_dir: /workspace/frontend
+    command: npm run dev -- --host 0.0.0.0
+    depends_on:
+      - backend
+
